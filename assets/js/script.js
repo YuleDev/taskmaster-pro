@@ -140,22 +140,24 @@ $(this).replaceWith(taskP);
 
 $(".list-group").on("click", "span", function() {
 
-  var date = $(this)
-  .text()
-  .trim();
+  var date = $(this).text().trim();
 
-  var dateInput = $("<input>")
-  .attr("type", "text")
-  .addClass("form-control")
-  .val(date);
+  var dateInput = $("<input>").attr("type", "text").addClass("form-control").val(date);
 
   $(this).replaceWith(dateInput);
 
+  dateInput.datepicker({
+    mineDate: 1,
+    onClose: function() {
+      $(this).trigger("change");
+    }
+  });
+
   dateInput.trigger("focus");
 
-})
+});
 
-$(".list-group").on("blur", "input[type='text']", function() {
+$(".list-group").on("change", "input[type='text']", function() {
   var date = $(this)
   .val()
   .trim();
@@ -177,13 +179,10 @@ $(".list-group").on("blur", "input[type='text']", function() {
   .text(date);
 
   $(this).replaceWith(taskSpan);
+
 });
 
 /* 5.1.7 event handler end */
-
-
-
-
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -246,6 +245,14 @@ $("#remove-tasks").on("click", function() {
   }
   saveTasks();
 });
+
+  /* datepicker code begins */
+
+  $("#modalDueDate").datepicker({
+    mineDate: 1
+  });
+
+  /* date picker code ends here */
 
 // load tasks for the first time
 loadTasks();
