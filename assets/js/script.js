@@ -54,12 +54,14 @@ $(".card .list-group").sortable({
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
-  var taskSpan = $("<span>")
-    .addClass("badge badge-primary badge-pill")
-    .text(taskDate);
-  var taskP = $("<p>")
-    .addClass("m-1")
-    .text(taskText);
+  var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(taskDate);
+  var taskP = $("<p>").addClass("m-1").text(taskText);
+
+  taskLi.append(taskSpan, taskP);
+
+  auditTask(taskLi);
+
+  $("#list-" + taskList).append(taskLi);
 
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
@@ -158,27 +160,20 @@ $(".list-group").on("click", "span", function() {
 });
 
 $(".list-group").on("change", "input[type='text']", function() {
-  var date = $(this)
-  .val()
-  .trim();
+  var date = $(this).val().trim();
 
-  var status = $(this)
-  .closest(".list-group")
-  .attr("id")
-  .replace("list-", "");
+  var status = $(this).closest(".list-group").attr("id").replace("list-", "");
 
-  var index = $(this)
-  .closest(".list-group-item")
-  .index();
+  var index = $(this).closest(".list-group-item").index();
 
   tasks[status][index].date = date;
   saveTasks();
 
-  var taskSpan = $("<span>")
-  .addClass("badge badge-primary badge-pill")
-  .text(date);
+  var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(date);
 
   $(this).replaceWith(taskSpan);
+
+  auditTask($(taskSpan).closest(".list-group-item"));
 
 });
 
@@ -217,6 +212,21 @@ $("#task-form-modal .btn-primary").click(function() {
     saveTasks();
   }
 });
+
+var auditTask = function(taskEl) {
+  var date = $(taskEl).find("span").text().trim();
+
+  var time = moment(date, "L").set("hour", 17);
+
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
 
 /* trash coding begins */
 
